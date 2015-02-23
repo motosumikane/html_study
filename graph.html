@@ -5,8 +5,9 @@
      <title>D3のグラフ勉強</title>
      <style>
           .axis path, .axis line {
-               fill : none,
+               fill : none;
                stroke: black;
+               shape-rendering: crispEdges;
           }
 
           .axis text {
@@ -27,26 +28,35 @@
 
           var w = 1000;
           var h = 500;
+          var yPadding = 20;
+          var wPadding = 4;
 
           var svg = d3.select("body").append("svg").attr({width:w, height:h});
 
-         var xScale = d3.scale.ordinal()
-            .rangeRoundBands([0, w], .1);
+         //var xScale = d3.scale.ordinal()
+         //   .rangeRoundBands([0, w], 0.4);
+          var xScale = d3.scale.linear()
+                              .domain([0, dataset.length])
+                              .range([0, w]);
 
           var yScale = d3.scale.linear()
                               .domain([0, d3.max(dataset)])
-                              .range([h, 0]);
+                              .range([h, 0], 1.0);
 
           var xAxis = d3.svg.axis()
                               .scale(xScale)
                               .orient("bottom");
+          var yAxis = d3.svg.axis()
+                              .scale(yScale)
+                              .orient("left");
 
           svg.append("g")
                .attr({
                     class: "axis",
-                    transform: "translate(0, " + (h - 300) + ")"
+                    transform: "translate(0, " + (h - yPadding) + ")"
                })
                .call(xAxis);
+          svg.append("g").attr("class", "axis").call(yAxis);
 
           svg.selectAll("rect")
                .data(dataset)
@@ -59,9 +69,9 @@
                     d3.select(this).attr({"fill": "red"});
                })
                .attr({
-                    x: function (d, i) { return i * 30;},
-                    y: function(d, i) { return yScale(d);},
-                    width: 26,
+                    x: function (d, i) { return i * w/dataset.length;},
+                    y: function(d, i) { return yScale(d) - yPadding;},
+                    width: w/dataset.length - wPadding,
                     height: function(d) { return h - yScale(d);},
                     fill : "red",
 
