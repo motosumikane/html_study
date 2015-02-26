@@ -33,29 +33,36 @@
 
           var svg = d3.select("body").append("svg").attr({width:w, height:h});
 
-         //var xScale = d3.scale.ordinal()
-         //   .rangeRoundBands([0, w], 0.4);
+          //var xScale = d3.scale.ordinal()
+          //   .rangeRoundBands([0, w], 0.4);
+          // X軸のスケール
           var xScale = d3.scale.linear()
                               .domain([0, dataset.length])
                               .range([0, w]);
 
+          // Y軸のスケール
           var yScale = d3.scale.linear()
                               .domain([0, d3.max(dataset)])
                               .range([h, 0], 1.0);
 
+          // 横軸の定義
           var xAxis = d3.svg.axis()
                               .scale(xScale)
                               .orient("bottom");
+          // 縦軸の定義
           var yAxis = d3.svg.axis()
                               .scale(yScale)
                               .orient("left");
 
+          // X軸の表示
           svg.append("g")
                .attr({
                     class: "axis",
                     transform: "translate(0, " + (h - yPadding) + ")"
                })
                .call(xAxis);
+ 
+          // Y軸の表示
           svg.append("g").attr("class", "axis").call(yAxis);
 
           svg.selectAll("rect")
