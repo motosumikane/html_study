@@ -29,59 +29,64 @@
           var w = 1000;
           var h = 500;
           var yPadding = 20;
-          var wPadding = 4;
+          var wPadding = 40;
 
-          var svg = d3.select("body").append("svg").attr({width:w, height:h});
+          // svgの定義
+          var svg = d3.select("body").append("svg")
+               .attr({
+                    width: w + wPadding, 
+                    height: h + yPadding,
+               });
 
-          //var xScale = d3.scale.ordinal()
-          //   .rangeRoundBands([0, w], 0.4);
           // X軸のスケール
           var xScale = d3.scale.linear()
-                              .domain([0, dataset.length])
-                              .range([0, w]);
+               .domain([0, dataset.length])
+               .range([0, w]);
 
-          // Y軸のスケール
+          // Y軸のスケール ※y軸を下から上にしたいときはdomainと逆にrangeを指定する
           var yScale = d3.scale.linear()
-                              .domain([0, d3.max(dataset)])
-                              .range([h, 0], 1.0);
+               .domain([0, d3.max(dataset)])
+               .range([h, 0]);
+
+          console.log(d3.extent(dataset));
 
           // 横軸の定義
           var xAxis = d3.svg.axis()
-                              .scale(xScale)
-                              .orient("bottom");
+                    .scale(xScale)                // scale定義
+                    .orient("bottom");            // 数字を軸のどこに表示するか
+
           // 縦軸の定義
           var yAxis = d3.svg.axis()
-                              .scale(yScale)
-                              .orient("left");
+                    .scale(yScale)
+                    .orient("left");
 
           // X軸の表示
           svg.append("g")
                .attr({
-                    class: "axis",
-                    transform: "translate(0, " + (h - yPadding) + ")"
+                    class : "xAxis",
+                    transform: "translate(" + wPadding + ",  " + (h - yPadding) + ")"
                })
                .call(xAxis);
  
           // Y軸の表示
-          svg.append("g").attr("class", "axis").call(yAxis);
-
-          svg.selectAll("rect")
-               .data(dataset)
-               .enter()
-               .append("rect")
-               .on("mouseover", function(d){
-                    d3.select(this).attr({"fill": "green"});
-               })
-               .on("mouseout", function(d){
-                    d3.select(this).attr({"fill": "red"});
-               })
+          svg.append("g")
                .attr({
-                    x: function (d, i) { return i * w/dataset.length;},
-                    y: function(d, i) { return yScale(d) - yPadding;},
-                    width: w/dataset.length - wPadding,
-                    height: function(d) { return h - yScale(d);},
-                    fill : "red",
+                    class : "yAxis",
+                    transform: "translate(" + wPadding + ", " + -yPadding + ")"
+               })
+               .call(yAxis);
 
+          // 線の定義
+          var line = d3.svg.line()
+            .x(function(d, i) { return i * w/dataset.length + wPadding;})
+            .y(function(d) { return yScale(d) - yPadding; });     
+
+          // SCGにグラフを表示
+          svg.append("path")
+               .attr({
+                    d: line(dataset),   // 折れ線の場合は線の定義にdataをセットする
+                    fill: "none",       // noneと指定しないと黒く塗りつぶされる
+                    stroke: "blue"      // 線の色を指定しないと表示されない
                });
      </script>
 </body>
